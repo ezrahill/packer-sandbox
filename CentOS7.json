@@ -1,0 +1,60 @@
+{
+  "variables": {
+    "vc_server": "{{env `VC_SERVER`}}",
+    "esx_host": "{{env `ESX_HOST`}}",
+    "vc_user": "{{env `VC_USER`}}",
+    "vc_password": "{{env `VC_PASSWORD`}}",
+    "ssh_user": "{{env `SSH_USER`}}",
+    "ssh_password": "{{env `SSH_PASSWORD`}}"
+
+  },
+
+  "sensitive-variables": ["vc_password","ssh_password"],
+
+  "builders": [
+    {
+      "type": "vsphere-iso",
+
+      "vcenter_server":      "{{user `vc_server`}}",
+      "username":            "{{user `vc_user`}}",
+      "password":            "{{user `vc_password`}}",
+      "insecure_connection": "true",
+      "vm_name": "CentOS-Template",
+      "notes": "Build via Packer",
+      "datacenter": "Physical",
+      "cluster": "Cluster",
+      "host": "{{user `esx_host`}}",
+      "datastore": "SSD_T20",
+      "network": "VM Network",
+      "resource_pool": "",
+
+      "guest_os_type": "centos7_64Guest",
+
+      "ssh_username": "{{user `ssh_user`}}",
+      "ssh_password": "{{user `ssh_password`}}",
+
+      "CPUs":             1,
+      "RAM":              1024,
+      "RAM_reserve_all": false,
+
+      "convert_to_template": true,
+
+      "disk_controller_type":  "pvscsi",
+      "disk_size":        25000,
+      "disk_thin_provisioned": true,
+
+      "network_card": "vmxnet3",
+
+      "iso_paths": [
+        "[SSD_T20] ISOs/CentOS-7-x86_64-Minimal-1708.iso"
+      ],
+      "iso_checksum": "5848f2fd31c7acf3811ad88eaca6f4aa",
+      "iso_checksum_type": "md5",
+      "floppy_files": [
+        "{{template_dir}}/ks.cfg"
+      ],
+      "boot_order": "disk,cdrom",
+      "boot_command": " <esc> <wait> linux inst.text inst.ks=hd:fd0:/ks.cfg <enter> "
+          }
+  ]
+}
